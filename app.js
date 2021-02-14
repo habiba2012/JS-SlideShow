@@ -23,16 +23,20 @@ const showImages = (images) => {
     let div = document.createElement('div');
     div.className = 'col-lg-3 col-md-4 col-xs-6 img-item mb-2';
     div.innerHTML = ` <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}") src="${image.webformatURL}" alt="${image.tags}">`;
-    gallery.appendChild(div)
+    gallery.appendChild(div);
   })
-
 }
 
 const getImages = (query) => {
+ setTimeout(function(){
+  const spinner = document.getElementById('spinner-load');
+  spinner.classList.toggle('display-spinner');
+},3000); 
+
   fetch(`https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`)
     .then(response => response.json())
     .then(data => showImages(data.hits))
-    .catch(err => console.log(err))
+    .catch(error => displayError('Something Went Wrong!! Please try again later!'));
 }
 // Enter keypress event
 document.getElementById('search')
@@ -55,7 +59,9 @@ const selectItem = (event, img) => {
   }
 }
 var timer
+
 const createSlider = () => {
+ 
   // check slider image length
   if (sliders.length < 2) {
     alert('Select at least 2 image.')
@@ -74,11 +80,8 @@ const createSlider = () => {
   document.querySelector('.main').style.display = 'block';
   // hide image aria
   imagesArea.style.display = 'none';
-  const duration = document.getElementById('duration').value || 1000;
-  if(duration <0 ){
-    alert('Please enter positive value')
-  }
-  else{
+ const duration = document.getElementById('duration').value || 1000;
+  
   sliders.forEach(slide => {
     let item = document.createElement('div')
     item.className = "slider-item";
@@ -87,8 +90,8 @@ const createSlider = () => {
     alt="">`;
     sliderContainer.appendChild(item)
   })
-  }
-  changeSlide(0)
+
+  
   timer = setInterval(function () {
     slideIndex++;
     changeSlide(slideIndex);
@@ -130,5 +133,25 @@ searchBtn.addEventListener('click', function () {
 })
 
 sliderBtn.addEventListener('click', function () {
-  createSlider()
+  if(duration.value < 0 ){
+    alert('Please enter positive value')
+    return;
+  }
+ 
+createSlider()
 })
+
+const toggleSpinner = ()=>{
+const spinner = document.getElementById('spinner-load');
+spinner.classList.toggle('display-spinner');
+}
+/* setTimeout(function(){
+  const spinner = document.getElementById('spinner-load');
+  spinner.classList.toggle('display-spinner');
+},
+    3000); */
+
+const displayError = error => {
+    const errorTag = document.getElementById('error-message');
+    errorTag.innerText = error;
+}
